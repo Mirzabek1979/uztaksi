@@ -3,60 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taxi Map</title>
+    <title>Taxi App</title>
     <script src="https://telegram.org"></script>
-    <!-- Yandex Maps API (Kalitsiz ham sinov rejimida ishlaydi) -->
-    <script src="https://yandex.ru" type="text/javascript"></script>
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; text-align: center; background: #f0f0f0; }
-        #map { width: 100%; height: 350px; background: #ccc; margin-bottom: 10px; }
-        .box { padding: 20px; background: white; border-radius: 20px 20px 0 0; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #f7d117; border: none; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f4; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .map-box { 
+            width: 100%; height: 200px; background: #e0e0e0; 
+            margin: 20px 0; border-radius: 10px; display: flex; 
+            align-items: center; justify-content: center; font-weight: bold; color: #888;
+            border: 2px dashed #ccc;
+        }
+        button { 
+            width: 100%; padding: 15px; background: #f7d117; 
+            border: none; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; 
+        }
+        input { width: 90%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; }
     </style>
 </head>
 <body>
-    <div id="map">Харита юкланмоқда...</div>
-    <div class="box">
-        <h3>📍 Қаерга борамиз?</h3>
-        <p id="info">Харитадан манзилни танланг</p>
-        <button id="orderBtn">Буюртма бериш</button>
+    <div class="card">
+        <h2>🚖 Taksi Buyurtma</h2>
+        <p>Manzilingizni kiriting ёки харитадан танланг</p>
+        
+        <input type="text" id="from" placeholder="Qayerdan? (A manzil)">
+        <input type="text" id="to" placeholder="Qayerga? (B manzil)">
+
+        <div class="map-box" id="fakeMap">
+            📍 Xarita yuklanmoqda...
+        </div>
+
+        <button id="orderBtn">Buyurtma berish</button>
     </div>
 
-    <script type="text/javascript">
+    <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        ymaps.ready(function () {
-            var myMap = new ymaps.Map("map", {
-                center: [41.311, 69.240], // Тошкент
-                zoom: 12,
-                controls: ['zoomControl', 'geolocationControl']
-            });
-
-            var myPlacemark;
-
-            // Харита босилганда
-            myMap.events.add('click', function (e) {
-                var coords = e.get('coords');
-
-                if (myPlacemark) {
-                    myPlacemark.geometry.setCoordinates(coords);
-                } else {
-                    myPlacemark = new ymaps.Placemark(coords, {}, { preset: 'islands#yellowTaxiIcon' });
-                    myMap.geoObjects.add(myPlacemark);
-                }
-                document.getElementById('info').innerText = "Манзил белгиланди!";
-            });
-
-            document.getElementById('orderBtn').onclick = function() {
-                if (!myPlacemark) {
-                    alert("Илтимос, харитадан жойни танланг!");
-                    return;
-                }
-                var coords = myPlacemark.geometry.getCoordinates();
-                tg.sendData(coords[0].toFixed(5) + "," + coords[1].toFixed(5));
+        // Agar haqiqiy xarita yuklanmasa, biz oddiy matnli xabar yuboramiz
+        document.getElementById('orderBtn').onclick = function() {
+            let from = document.getElementById('from').value;
+            let to = document.getElementById('to').value;
+            
+            if (from && to) {
+                // Ma'lumotni botga yuborish
+                tg.sendData("A: " + from + " -> B: " + to);
                 tg.close();
-            };
+            } else {
+                alert("Iltimos, manzillarni kiriting!");
+            }
+        };
+
+        // Telegram foydalanuvchi joylashuvini so'rash (Haqiqiy koordinata uchun)
+        tg.MainButton.setText("MANZILNI TASDIQLASH").show();
+        tg.MainButton.onClick(function() {
+            let from = document.getElementById('from').value;
+            let to = document.getElementById('to').value;
+            tg.sendData("A: " + from + " -> B: " + to);
         });
     </script>
 </body>
