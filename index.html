@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi App</title>
+    <script src="https://telegram.org"></script>
+    <style>
+        body { font-family: sans-serif; background: #f0f0f0; padding: 20px; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 15px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        select, input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+        button { width: 100%; padding: 12px; background: #f7d117; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Taksi Buyurtma Qilish</h2>
+        <input type="text" id="from" placeholder="Qayerdan?">
+        <input type="text" id="to" placeholder="Qayerga?">
+        <select id="tariff">
+            <option value="ekonom">Ekonom - 12 000 so'm</option>
+            <option value="komfort">Komfort - 18 000 so'm</option>
+            <option value="biznes">Biznes - 30 000 so'm</option>
+        </select>
+        <button onclick="order()">Buyurtma berish</button>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Oynani to'liq ochish
+
+        function order() {
+            let from = document.getElementById('from').value;
+            let to = document.getElementById('to').value;
+            if (from && to) {
+                tg.sendData(`Buyurtma: ${from} -> ${to}`); // Botga ma'lumot yuborish
+                tg.close(); // Oynani yopish
+            } else {
+                alert("Iltimos, manzillarni kiriting!");
+            }
+        }
+    </script>
+</body>
+</html>
